@@ -165,4 +165,12 @@ module.exports = {
 			}
 		}, */
 	},
+	events: {
+		"order.status": {
+			async handler(ctx) {
+				const { id, status } = ctx.params;
+				console.log("soy el API", id, status);
+			},
+		},
+	},
 };
