@@ -48,11 +48,16 @@ module.exports = {
 				},
 				type: { type: "string", enum: ["in", "out"] },
 				productName: { type: "string" },
+				sid: { type: "string" },
 				$$strict: true,
 			},
 			async handler(ctx) {
-				const order = await orderHelper.add(ctx.params);
+				const order = await orderHelper.add({
+					...ctx.params,
+					id: ctx.meta.id,
+				});
 				this.broker.emit("order.new", order);
+				return { ok: 1, order };
 			},
 		},
 		list: {
@@ -85,9 +90,9 @@ module.exports = {
 		"stock.updated": {
 			async handler(ctx) {
 				const { ok } = ctx.params;
-				const { orderId } = ctx.params.data;
-				if (ok) this.setOrderStatus(orderId, "confirmed");
-				else this.setOrderStatus(orderId, "rejected");
+				const { orderId, sid } = ctx.params.data;
+				if (ok) this.setOrderStatus(orderId, "confirmed", sid);
+				else this.setOrderStatus(orderId, "rejected", sid);
 			},
 		},
 	},
@@ -96,11 +101,11 @@ module.exports = {
 	 * Methods
 	 */
 	methods: {
-		setOrderStatus(id, status) {
+		setOrderStatus(id, status, sid) {
 			const resp = orderHelper.setStatus(id, status);
 			if (resp) {
-				this.broker.emit("order.status", { id, status });
-				console.log("he emitido", id, status);
+				this.broker.emit("order.status", { id, status, sid });
+				console.log("he emitido", id, status, sid);
 			}
 		},
 	},

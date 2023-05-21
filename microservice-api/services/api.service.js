@@ -1,6 +1,8 @@
 "use strict";
 
 const ApiGateway = require("moleculer-web");
+const { v4: uuidv4 } = require("uuid");
+const IO = require("socket.io");
 
 /**
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema Moleculer's Service Schema
@@ -24,6 +26,8 @@ module.exports = {
 
 		// Global Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
 		use: [],
+
+		clients: [],
 
 		routes: [
 			{
@@ -57,11 +61,12 @@ module.exports = {
 				 * @param {IncomingRequest} req
 				 * @param {ServerResponse} res
 				 * @param {Object} data
-				 *
+				 */
 				onBeforeCall(ctx, route, req, res) {
 					// Set request headers to context meta
-					ctx.meta.userAgent = req.headers["user-agent"];
-				}, */
+					//ctx.meta.userAgent = req.headers["user-agent"];
+					ctx.meta.id = uuidv4();
+				},
 
 				/**
 				 * After call hook. You can modify the data.
@@ -168,9 +173,49 @@ module.exports = {
 	events: {
 		"order.status": {
 			async handler(ctx) {
-				const { id, status } = ctx.params;
-				console.log("soy el API", id, status);
+				const { id, status, sid } = ctx.params;
+				// console.log("soy el API", id, status);
+
+				console.log(
+					this.settings.clients.map((el) => el.id),
+					sid
+				);
+
+				const socket = this.settings.clients.find(
+					(el) => el.id === sid
+				);
+				if (socket) socket.emit("eventoAlCliente", { id, status });
 			},
 		},
+	},
+	started() {
+		// Create a Socket.IO instance, passing it our server
+		this.io = IO(this.server);
+
+		// Add a connect listener
+		this.io.on("connection", (client) => {
+			this.logger.info("Client connected via websocket!");
+			this.settings.clients.push(client);
+
+			client.on("call", ({ action, params, opts }, done) => {
+				this.logger.info(
+					"Received request from client! Action:",
+					action,
+					", Params:",
+					params
+				);
+
+				this.broker
+					.call(action, params, opts)
+					.then((res) => {
+						if (done) done(res);
+					})
+					.catch((err) => this.logger.error(err));
+			});
+
+			client.on("disconnect", () => {
+				this.logger.info("Client disconnected");
+			});
+		});
 	},
 };

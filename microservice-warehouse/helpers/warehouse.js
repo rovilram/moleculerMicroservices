@@ -61,19 +61,21 @@ function confirmJSON(order, product) {
 			productName: order.productName,
 			stock: product.stock,
 			orderId: order.id,
+			sid: order.sid,
 		},
 	};
 }
 
-function rejectJSON(stock, product) {
+function rejectJSON(order, product) {
 	return {
 		ok: 0,
 		message: "Not enough stock",
 		data: {
-			productName: stock.productName,
+			productName: order.productName,
 			stock: product.stock,
-			quantity: stock.quantity,
-			orderId: stock.id,
+			quantity: order.quantity,
+			orderId: order.id,
+			sid: order.sid,
 		},
 	};
 }

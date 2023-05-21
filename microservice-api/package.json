@@ -25,9 +25,11 @@
     "moleculer-repl": "^0.7.3"
   },
   "dependencies": {
+    "moleculer": "^0.14.26",
     "moleculer-web": "^0.10.4",
     "nats": "^2.7.1",
-    "moleculer": "^0.14.26"
+    "socket.io": "^4.6.1",
+    "uuid": "^9.0.0"
   },
   "engines": {
     "node": ">= 16.x.x"
