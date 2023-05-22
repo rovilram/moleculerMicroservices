@@ -19,7 +19,6 @@ function setStatus(id, status) {
 	const order = orders.find((el) => el.id === id);
 	if (!order) return false;
 	order.status = status;
-	console.log("order", order);
 	return true;
 }
 

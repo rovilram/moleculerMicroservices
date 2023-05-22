@@ -105,7 +105,6 @@ module.exports = {
 			const resp = orderHelper.setStatus(id, status);
 			if (resp) {
 				this.broker.emit("order.status", { id, status, sid });
-				console.log("he emitido", id, status, sid);
 			}
 		},
 	},

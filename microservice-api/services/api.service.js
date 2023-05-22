@@ -174,12 +174,6 @@ module.exports = {
 		"order.status": {
 			async handler(ctx) {
 				const { id, status, sid } = ctx.params;
-				// console.log("soy el API", id, status);
-
-				console.log(
-					this.settings.clients.map((el) => el.id),
-					sid
-				);
 
 				const socket = this.settings.clients.find(
 					(el) => el.id === sid

@@ -31,11 +31,9 @@ module.exports = {
 	events: {
 		"order.new": {
 			async handler(ctx) {
-				console.log(ctx);
 				const resp = await warehouseHelper.updateStock(
 					ctx.params.order
 				);
-				console.log("resp", resp);
 				this.broker.emit("stock.updated", { ...resp });
 			},
 		},
