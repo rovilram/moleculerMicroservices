@@ -1,28 +1,20 @@
 version: "3.3"
 
 services:
-
-
-  greeter:
+  microservice-warehouse:
     build:
       context: .
-    image: microservice-orders
+    image: microservice-warehouse
     env_file: docker-compose.env
     environment:
-      SERVICES: greeter
-    depends_on:
-      - nats
+      SERVICES: warehouse
     networks:
-      - internal
-
-  nats:
-    image: nats:2
-    networks:
-      - internal
-
+      - api-network
 
 networks:
-  internal:
+  api-network:
+    name: microservice-api_internal
+    external: true
 
 volumes:
   data:
