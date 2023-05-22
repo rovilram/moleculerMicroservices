@@ -194,27 +194,11 @@ module.exports = {
 
 		// Add a connect listener
 		this.io.on("connection", (client) => {
-			this.logger.info("Client connected via websocket!");
+			this.logger.info("Client connected via websocket!", client.id);
 			this.settings.clients.push(client);
 
-			client.on("call", ({ action, params, opts }, done) => {
-				this.logger.info(
-					"Received request from client! Action:",
-					action,
-					", Params:",
-					params
-				);
-
-				this.broker
-					.call(action, params, opts)
-					.then((res) => {
-						if (done) done(res);
-					})
-					.catch((err) => this.logger.error(err));
-			});
-
 			client.on("disconnect", () => {
-				this.logger.info("Client disconnected");
+				this.logger.info("Client disconnected", client.id);
 			});
 		});
 	},
